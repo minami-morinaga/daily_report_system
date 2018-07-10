@@ -42,20 +42,25 @@ public class LoginFilter implements Filter {
         String context_path = ((HttpServletRequest)request).getContextPath();
         String servlet_path = ((HttpServletRequest)request).getServletPath();
 
+        //servlet_path.が/cssとマッチしなかった時、eにlogin_employeeの情報を渡す
         if(!servlet_path.matches("/css.*")) {
             HttpSession session = ((HttpServletRequest)request).getSession();
             Employee e = (Employee)session.getAttribute("login_employee");
 
+            //servlet_path.が/loginと一致しなかった時（ログインページ以外にアクセスしたとき）
+            //eが空ならログインができていないのでloginページへ
             if(!servlet_path.equals("/login")) {
                 if(e == null) {
                     ((HttpServletResponse)response).sendRedirect(context_path + "/login");
                     return;
                 }
 
+                //servlet_path.が/employeesと一致してる（従業員管理のページにアクセスしたとき）一般社員ならindexpageへ行くよ
                 if(servlet_path.matches("/employees.*") && e.getAdmin_flag() == 0) {
                     ((HttpServletResponse)response).sendRedirect(context_path + "/");
                     return;
                 }
+                //eが空じゃないならindexのページに行くよね
             } else {
                 if(e != null) {
                     ((HttpServletResponse)response).sendRedirect(context_path + "/");

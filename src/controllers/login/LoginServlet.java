@@ -56,6 +56,8 @@ public class LoginServlet extends HttpServlet {
 
         Employee e = null;
 
+        //codeとpassがnullじゃやない時（DBにcodeとpassが登録されてるとき）登録されているpassを持ってくる
+        //try～でpassがあっているか確認する
         if(code != null && !code.equals("") && plain_pass != null && !plain_pass.equals("")) {
             EntityManager em = DBUtil.createEntityManager();
 
@@ -73,11 +75,15 @@ public class LoginServlet extends HttpServlet {
 
             em.close();
 
+            //上のtryの結果eがnullじゃない（値がセットできる＝passがあっている）時はcheck_result = true;となり下記に進む
             if(e != null) {
                 check_result = true;
             }
         }
 
+        //check_resultがtrue()なら・・・
+        //hasErrorがtrue(エラーがある)の時はログイン画面を表示
+        //そうでないとき(パスワードがあっていた時)は"login_employee", eに値をセットしてログイン完了のフラッシュを出す
         if(!check_result) {
             request.setAttribute("_token", request.getSession().getId());
             request.setAttribute("hasError", true);
